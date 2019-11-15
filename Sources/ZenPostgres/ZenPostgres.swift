@@ -44,13 +44,13 @@ public class ZenPostgres: Database {
     }
 
     public func connect() -> EventLoopFuture<PostgresConnection> {
-        let request = pool.requestConnection()
-        
-        #if DEBUG
-        print("CONNECT")
-        #endif
-        
-        return request
+        return pool.requestConnection().map { conn -> PostgresConnection in
+            #if DEBUG
+            print("CONNECT")
+            #endif
+            
+            return conn
+        }
     }
     
     public func disconnect(_ connection: PostgresConnection) {
