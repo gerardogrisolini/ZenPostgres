@@ -21,7 +21,7 @@ public class ZenPostgres: Database {
     private let eventLoopGroup: EventLoopGroup
     private let connectionPool: ConnectionPool<PostgresConnectionSource>
        
-    public init(config: PostgresConfig, eventLoopGroup: EventLoopGroup) throws {
+    public init(config: PostgresConfig, eventLoopGroup: EventLoopGroup) {
         self.eventLoopGroup = eventLoopGroup
         
         let configuration = PostgresConfiguration(
