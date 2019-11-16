@@ -42,9 +42,7 @@ open class PostgresTable {
     open func decode(row: PostgresRow) { }
     
     fileprivate func query(_ conn: PostgresConnection, _ sql: String) -> EventLoopFuture<[PostgresRow]> {
-        #if DEBUG
-        print(sql)
-        #endif
+        debugPrint(sql)
         return conn.query(sql)
     }
     
@@ -60,10 +58,8 @@ open class PostgresTable {
     }
 
     fileprivate var createSQL: String {
-        #if DEBUG
-        print("Running create: \(table)")
-        #endif
-
+        debugPrint("Running create: \(table)")
+        
         var opt = [String]()
         var keyName = ""
         for child in Mirror(reflecting: self).children {

@@ -20,16 +20,7 @@ public class ZenPostgres: Database {
 
     private let eventLoopGroup: EventLoopGroup
     private let connectionPool: ConnectionPool<PostgresConnectionSource>
-    
-//    public init(config: PostgresConfig, numberOfThreads: Int = System.coreCount) throws {
-//        eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: numberOfThreads)
-//        let db = PostgresConnectionSource(
-//            configuration: .init(hostname: config.host, username: config.username, password: config.password, database: config.database)
-//        )
-//        pool = ConnectionPool(configuration: .init(maxConnections: config.maximumConnections), source: db, on: self.eventLoopGroup)
-//        ZenPostgres.pool = self
-//    }
-   
+       
     public init(config: PostgresConfig, eventLoopGroup: EventLoopGroup) throws {
         self.eventLoopGroup = eventLoopGroup
         
@@ -55,27 +46,18 @@ public class ZenPostgres: Database {
 
     public func connect() -> EventLoopFuture<PostgresConnection> {
         return connectionPool.requestConnection().map { conn -> PostgresConnection in
-            #if DEBUG
-            print("CONNECT")
-            #endif
-            
+            debugPrint("CONNECT")
             return conn
         }
     }
     
     public func disconnect(_ connection: PostgresConnection) {
-        #if DEBUG
-        print("DISCONNECT")
-        #endif
-
+        debugPrint("DISCONNECT")
         connectionPool.releaseConnection(connection)
     }
 
     public func close() throws {
-        #if DEBUG
-        print("CLOSE")
-        #endif
-
+        debugPrint("CLOSE")
         connectionPool.shutdown()
         try eventLoopGroup.syncShutdownGracefully()
     }
@@ -141,5 +123,3 @@ public struct Cursor {
         self.totalRecords   = totalRecords
     }
 }
-
-
