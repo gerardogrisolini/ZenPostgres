@@ -23,7 +23,7 @@ final class ZenPostgresTests: XCTestCase {
     override func setUp() {
         do {
             eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)
-            pool = try ZenPostgres(config: config)
+            pool = try ZenPostgres(config: config, eventLoopGroup: eventLoopGroup)
             connection = try pool.connect().wait()
         } catch {
             XCTFail(error.localizedDescription)

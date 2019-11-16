@@ -21,14 +21,14 @@ public class ZenPostgres: Database {
     private let eventLoopGroup: EventLoopGroup
     private let pool: ConnectionPool<PostgresConnectionSource>
     
-    public init(config: PostgresConfig, numberOfThreads: Int = System.coreCount) throws {
-        eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: numberOfThreads)
-        let db = PostgresConnectionSource(
-            configuration: .init(hostname: config.host, username: config.username, password: config.password, database: config.database)
-        )
-        pool = ConnectionPool(configuration: .init(maxConnections: config.maximumConnections), source: db, on: self.eventLoopGroup)
-        ZenPostgres.pool = self
-    }
+//    public init(config: PostgresConfig, numberOfThreads: Int = System.coreCount) throws {
+//        eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: numberOfThreads)
+//        let db = PostgresConnectionSource(
+//            configuration: .init(hostname: config.host, username: config.username, password: config.password, database: config.database)
+//        )
+//        pool = ConnectionPool(configuration: .init(maxConnections: config.maximumConnections), source: db, on: self.eventLoopGroup)
+//        ZenPostgres.pool = self
+//    }
    
     public init(config: PostgresConfig, eventLoopGroup: EventLoopGroup) throws {
         self.eventLoopGroup = eventLoopGroup
