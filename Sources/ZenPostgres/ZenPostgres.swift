@@ -19,7 +19,7 @@ public class ZenPostgres: Database {
     public static var pool: ZenPostgres!
 
     private let eventLoopGroup: EventLoopGroup
-    private let pool: ConnectionPool<PostgresConnectionSource>
+    private let connectionPool: ConnectionPool<PostgresConnectionSource>
     
 //    public init(config: PostgresConfig, numberOfThreads: Int = System.coreCount) throws {
 //        eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: numberOfThreads)
@@ -32,10 +32,20 @@ public class ZenPostgres: Database {
    
     public init(config: PostgresConfig, eventLoopGroup: EventLoopGroup) throws {
         self.eventLoopGroup = eventLoopGroup
-        let db = PostgresConnectionSource(
-            configuration: .init(hostname: config.host, username: config.username, password: config.password, database: config.database)
+        
+        let configuration = PostgresConfiguration(
+            hostname: config.host,
+            port: config.port,
+            username: config.username,
+            password: config.password,
+            database: config.database,
+            tlsConfiguration: config.tls ? TLSConfiguration.clientDefault : nil
         )
-        pool = ConnectionPool(configuration: .init(maxConnections: config.maximumConnections), source: db, on: self.eventLoopGroup)
+        
+        let source = PostgresConnectionSource(configuration: configuration)
+        
+        connectionPool = ConnectionPool(configuration: .init(maxConnections: config.maximumConnections), source: source, on: self.eventLoopGroup)
+        
         ZenPostgres.pool = self
     }
 
@@ -44,7 +54,7 @@ public class ZenPostgres: Database {
     }
 
     public func connect() -> EventLoopFuture<PostgresConnection> {
-        return pool.requestConnection().map { conn -> PostgresConnection in
+        return connectionPool.requestConnection().map { conn -> PostgresConnection in
             #if DEBUG
             print("CONNECT")
             #endif
@@ -58,7 +68,7 @@ public class ZenPostgres: Database {
         print("DISCONNECT")
         #endif
 
-        pool.releaseConnection(connection)
+        connectionPool.releaseConnection(connection)
     }
 
     public func close() throws {
@@ -66,7 +76,7 @@ public class ZenPostgres: Database {
         print("CLOSE")
         #endif
 
-        pool.shutdown()
+        connectionPool.shutdown()
         try eventLoopGroup.syncShutdownGracefully()
     }
 }
