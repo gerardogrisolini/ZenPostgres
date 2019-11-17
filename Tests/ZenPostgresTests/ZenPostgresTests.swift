@@ -23,7 +23,7 @@ final class ZenPostgresTests: XCTestCase {
     override func setUp() {
         do {
             eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)
-            pool = try ZenPostgres(config: config, eventLoopGroup: eventLoopGroup)
+            pool = ZenPostgres(config: config, eventLoopGroup: eventLoopGroup)
             connection = try pool.connect().wait()
         } catch {
             XCTFail(error.localizedDescription)
@@ -250,11 +250,6 @@ final class ZenPostgresTests: XCTestCase {
     class Store: PostgresJson {
         public var storeId: Int = 0
         public var storeName: String = ""
-        
-        public var json: String {
-            let json = try! JSONEncoder().encode(self)
-            return String(data: json, encoding: .utf8)!
-        }
     }
     
     class Organization: PostgresTable, Codable {
@@ -269,25 +264,25 @@ final class ZenPostgresTests: XCTestCase {
             case organizationStore = "organizationStore"
         }
         
-        required init() {
-            super.init()
-        }
-        
-        required init(from decoder: Decoder) throws {
-            super.init()
-            
-            let container = try decoder.container(keyedBy: CodingKeys.self)
-            organizationId = try container.decode(Int.self, forKey: .organizationId)
-            organizationName = try container.decode(String.self, forKey: .organizationName)
-            organizationStore = try container.decode(Store.self, forKey: .organizationStore)
-        }
-        
-        func encode(to encoder: Encoder) throws {
-            var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(organizationId, forKey: .organizationId)
-            try container.encode(organizationName, forKey: .organizationName)
-            try container.encode(organizationStore, forKey: .organizationStore)
-        }
+//        required init() {
+//            super.init()
+//        }
+//
+//        required init(from decoder: Decoder) throws {
+//            super.init()
+//
+//            let container = try decoder.container(keyedBy: CodingKeys.self)
+//            organizationId = try container.decode(Int.self, forKey: .organizationId)
+//            organizationName = try container.decode(String.self, forKey: .organizationName)
+//            organizationStore = try container.decode(Store.self, forKey: .organizationStore)
+//        }
+//
+//        func encode(to encoder: Encoder) throws {
+//            var container = encoder.container(keyedBy: CodingKeys.self)
+//            try container.encode(organizationId, forKey: .organizationId)
+//            try container.encode(organizationName, forKey: .organizationName)
+//            try container.encode(organizationStore, forKey: .organizationStore)
+//        }
         
         override func decode(row: PostgresRow) {
             organizationId = row.column("organizationId")?.int ?? organizationId
@@ -316,7 +311,7 @@ final class ZenPostgresTests: XCTestCase {
         }
     }
     
-    class File: PostgresTable {
+    class File: PostgresTable, Codable {
         public var id: Int = 0
         public var name: String = ""
         public var data: [UInt8] = [UInt8]()

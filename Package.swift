@@ -5,20 +5,14 @@ import PackageDescription
 let package = Package(
     name: "ZenPostgres",
     products: [
-        .library(
-            name: "ZenPostgres",
-            targets: ["ZenPostgres"]),
+        .library(name: "ZenPostgres", targets: ["ZenPostgres"])
     ],
     dependencies: [
         .package(url: "https://github.com/vapor/postgres-kit.git", .branch("master"))
     ],
     targets: [
-        .target(
-            name: "ZenPostgres",
-            dependencies: ["PostgresKit"]),
-        .testTarget(
-            name: "ZenPostgresTests",
-            dependencies: ["ZenPostgres"]),
+        .target(name: "ZenPostgres", dependencies: ["PostgresKit"]),
+        .testTarget(name: "ZenPostgresTests", dependencies: ["ZenPostgres"]),
     ]
 )
 

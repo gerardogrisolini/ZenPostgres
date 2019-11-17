@@ -7,6 +7,8 @@
 
 import Foundation
 import PostgresNIO
+import PostgresKit
+
 
 open class PostgresTable {
     public var table: String = ""
@@ -25,8 +27,7 @@ open class PostgresTable {
             table = table[table.index(after: index)...].description
         }
         
-        let childrens = Mirror(reflecting: self).children
-        if let first = childrens.first, let key = first.label {
+        if let first = Mirror(reflecting: self).children.first, let key = first.label {
             pKey = key//.lowercased()
         }
     }
@@ -38,8 +39,55 @@ open class PostgresTable {
     private var pValue: Int {
         return Mirror(reflecting: self).children.first?.value as? Int ?? 0
     }
-    
-    open func decode(row: PostgresRow) { }
+
+    open func decode(row: PostgresRow) {
+        /*
+        for var child in Mirror(reflecting: self).children {
+            guard let key = child.label else {
+                continue
+            }
+            guard !key.hasPrefix("_") else {
+//                let obj = child.value as! PostgresTable
+//                obj.decode(row: row)
+//                child.value = obj
+                continue
+            }
+
+            guard let columnKey = row.column(key) else {
+                continue
+            }
+
+            switch child.value {
+            case is Bool:
+                child.value = columnKey.bool!
+            case is Float:
+                child.value = columnKey.float!
+            case is Double:
+                child.value = columnKey.double!
+            case is Int:
+                child.value = columnKey.int!
+            case is Int16:
+                child.value = columnKey.int16!
+            case is Int32:
+                child.value = columnKey.int32!
+            case is Int64:
+                child.value = columnKey.int64!
+            case is Date:
+                child.value = columnKey.date!
+            case is String:
+                child.value = columnKey.string!
+            case is UUID:
+                child.value = columnKey.uuid!
+            case is PostgresJson:
+                let obj = child.value as! PostgresJson
+                obj.decode(data: columnKey.jsonb!)
+                child.value = obj
+            default:
+                break
+            }
+        }
+        */
+    }
     
     fileprivate func query(_ conn: PostgresConnection, _ sql: String) -> EventLoopFuture<[PostgresRow]> {
         debugPrint(sql)
@@ -189,6 +237,7 @@ open class PostgresTable {
     
     open func get(_ key: String, _ value: Any) -> EventLoopFuture<Void> {
         let sql = "\(selectSQL) WHERE \"\(key.isEmpty ? pKey : key)\" = '\(value)' LIMIT 1 OFFSET 0"
+                
         return sqlRowsAsync(sql).flatMapThrowing { rows -> Void in
             if let row = rows.first {
                 return self.decode(row: row)
@@ -384,7 +433,7 @@ public protocol PostgresJson: Codable {
 extension PostgresJson {
     public var json: String {
         let json = try! JSONEncoder().encode(self)
-        return String(data: json, encoding: .utf8)!.replacingOccurrences(of: "'", with: "''")
+        return String(data: json, encoding: .utf8)!//.replacingOccurrences(of: "'", with: "''")
     }
 }
 
@@ -402,3 +451,4 @@ extension String.StringInterpolation {
         appendInterpolation("'\(value!.json)'::jsonb")
     }
 }
+
