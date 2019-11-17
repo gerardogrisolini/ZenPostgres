@@ -9,6 +9,38 @@ import Foundation
 import PostgresNIO
 import PostgresKit
 
+/*
+protocol KeyPathListable {
+    associatedtype AnyOldObject
+    // require empty init as the implementation use the mirroring API, which require
+    // to be used on an instance. So we need to be able to create a new instance of the
+    // type. See @@@^^^@@@
+    init()
+
+    var keyPathReadableFormat: [String: Any] { get }
+    var allKeyPaths: [String:KeyPath<AnyOldObject, Any?>] { get }
+}
+
+extension KeyPathListable {
+    var keyPathReadableFormat: [String: Any] {
+        var description: [String: Any] = [:]
+        let mirror = Mirror(reflecting: self)
+        for case let (label?, value) in mirror.children {
+            description[label] = value
+        }
+        return description
+    }
+
+    var allKeyPaths: [String:KeyPath<Self, Any?>] {
+        var membersTokeyPaths: [String:KeyPath<Self, Any?>] = [:]
+        let instance = Self()
+        for (key, _) in instance.keyPathReadableFormat {
+            membersTokeyPaths[key] = \Self.keyPathReadableFormat[key]
+        }
+        return membersTokeyPaths
+    }
+}
+*/
 
 open class PostgresTable {
     public var table: String = ""
@@ -41,57 +73,55 @@ open class PostgresTable {
     }
 
     open func decode(row: PostgresRow) {
-        /*
-        for var child in Mirror(reflecting: self).children {
-            guard let key = child.label else {
-                continue
-            }
-            guard !key.hasPrefix("_") else {
-//                let obj = child.value as! PostgresTable
-//                obj.decode(row: row)
+//        for child in self.allKeyPaths {
+//            let key = child.key
+//
+//            print("member: ", key, " / value: ", self[keyPath: child.value])
+
+//            guard !key.hasPrefix("_") else {
+//                continue
+//            }
+//
+//            guard let columnKey = row.column(key) else {
+//                continue
+//            }
+
+            
+//            switch child.value {
+//            case is Bool:
+//                child.value = columnKey.bool!
+//            case is Float:
+//                child.value = columnKey.float!
+//            case is Double:
+//                child.value = columnKey.double!
+//            case is Int:
+//                child.value = columnKey.int!
+//            case is Int16:
+//                child.value = columnKey.int16!
+//            case is Int32:
+//                child.value = columnKey.int32!
+//            case is Int64:
+//                child.value = columnKey.int64!
+//            case is Date:
+//                child.value = columnKey.date!
+//            case is String:
+//                child.value = columnKey.string!
+//            case is UUID:
+//                child.value = columnKey.uuid!
+//            case is PostgresJson:
+//                let obj = child.value as! PostgresJson
+//                obj.decode(data: columnKey.jsonb!)
 //                child.value = obj
-                continue
-            }
+//            default:
+//                break
+//            }
 
-            guard let columnKey = row.column(key) else {
-                continue
-            }
-
-            switch child.value {
-            case is Bool:
-                child.value = columnKey.bool!
-            case is Float:
-                child.value = columnKey.float!
-            case is Double:
-                child.value = columnKey.double!
-            case is Int:
-                child.value = columnKey.int!
-            case is Int16:
-                child.value = columnKey.int16!
-            case is Int32:
-                child.value = columnKey.int32!
-            case is Int64:
-                child.value = columnKey.int64!
-            case is Date:
-                child.value = columnKey.date!
-            case is String:
-                child.value = columnKey.string!
-            case is UUID:
-                child.value = columnKey.uuid!
-            case is PostgresJson:
-                let obj = child.value as! PostgresJson
-                obj.decode(data: columnKey.jsonb!)
-                child.value = obj
-            default:
-                break
-            }
-        }
-        */
+//        }
     }
     
     fileprivate func query(_ conn: PostgresConnection, _ sql: String) -> EventLoopFuture<[PostgresRow]> {
         debugPrint(sql)
-        return conn.query(sql)
+        return conn.simpleQuery(sql)
     }
     
     public func sqlRowsAsync(_ sql: String) -> EventLoopFuture<[PostgresRow]> {
@@ -424,8 +454,7 @@ open class PostgresTable {
         }
     }
 }
-
-
+    
 public protocol PostgresJson: Codable {
     var json: String { get }
 }

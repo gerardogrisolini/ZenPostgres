@@ -50,7 +50,7 @@ public class ZenPostgres: Database {
             return conn
         }
     }
-    
+
     public func disconnect(_ connection: PostgresConnection) {
         debugPrint("DISCONNECT")
         connectionPool.releaseConnection(connection)

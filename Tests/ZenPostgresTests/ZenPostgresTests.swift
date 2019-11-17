@@ -263,7 +263,7 @@ final class ZenPostgresTests: XCTestCase {
             case organizationName = "organizationName"
             case organizationStore = "organizationStore"
         }
-        
+    
 //        required init() {
 //            super.init()
 //        }
@@ -283,7 +283,7 @@ final class ZenPostgresTests: XCTestCase {
 //            try container.encode(organizationName, forKey: .organizationName)
 //            try container.encode(organizationStore, forKey: .organizationStore)
 //        }
-        
+
         override func decode(row: PostgresRow) {
             organizationId = row.column("organizationId")?.int ?? organizationId
             organizationName = row.column("organizationName")?.string ?? organizationName
