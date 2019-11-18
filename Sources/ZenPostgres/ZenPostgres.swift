@@ -30,12 +30,12 @@ public class ZenPostgres: Database {
             username: config.username,
             password: config.password,
             database: config.database,
-            tlsConfiguration: config.tls ? TLSConfiguration.clientDefault : nil
+            tlsConfiguration: config.tls ? TLSConfiguration.forClient(certificateVerification: .none) : nil
         )
         
         let source = PostgresConnectionSource(configuration: configuration)
         
-        connectionPool = ConnectionPool(configuration: .init(maxConnections: config.maximumConnections), source: source, on: self.eventLoopGroup)
+        connectionPool = ConnectionPool(configuration: .init(maxConnections: config.maximumConnections), source: source, logger: config.logger, on: self.eventLoopGroup)
         
         ZenPostgres.pool = self
     }
