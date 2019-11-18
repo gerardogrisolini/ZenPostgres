@@ -65,10 +65,9 @@ public class ZenPostgres: ZenPostgresProtocol {
         connectionPool.releaseConnection(connection)
     }
 
-    public func close() throws {
+    public func close() {
         self.log("☯️  ZenPostgres terminated")
         connectionPool.shutdown()
-        try eventLoopGroup.syncShutdownGracefully()
     }
     
     public func log(_ message: String) {
