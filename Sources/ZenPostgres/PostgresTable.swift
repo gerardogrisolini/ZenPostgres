@@ -136,8 +136,6 @@ open class PostgresTable {
     }
 
     fileprivate var createSQL: String {
-        debugPrint("Running create: \(table)")
-        
         var opt = [String]()
         var keyName = ""
         for child in Mirror(reflecting: self).children {

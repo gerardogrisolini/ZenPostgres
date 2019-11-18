@@ -1,26 +1,32 @@
 import XCTest
 import NIO
 import PostgresNIO
+import Logging
 
 @testable import ZenPostgres
 
 
 final class ZenPostgresTests: XCTestCase {
     
-    private let config = PostgresConfig(
-        host: "localhost",
-        port: 5432,
-        tls: false,
-        username: "gerardo",
-        password: "",
-        database: "zenpostgres"
-    )
-    
     private var eventLoopGroup: EventLoopGroup!
     private var connection: PostgresConnection!
     private var pool: ZenPostgres!
     
     override func setUp() {
+        var logger = Logger(label: "ZenPostgres")
+        logger.logLevel = .debug
+        
+        let config = PostgresConfig(
+            host: "localhost",
+            port: 5432,
+            tls: false,
+            username: "gerardo",
+            password: "",
+            database: "zenpostgres",
+            logger: logger
+        )
+        
+
         do {
             eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)
             pool = ZenPostgres(config: config, eventLoopGroup: eventLoopGroup)

@@ -43,7 +43,7 @@ public class ZenPostgres: ZenPostgresProtocol {
         
         ZenPostgres.pool = self
         
-        logger.info(Logger.Message(stringLiteral: "▶️ ZenPostgres started on \(config.host):\(config.port)"))
+        logger.info(Logger.Message(stringLiteral: "☯️ ZenPostgres started on \(config.host):\(config.port)"))
     }
 
     public func newPromise<T>() -> EventLoopPromise<T> {
