@@ -14,7 +14,7 @@ final class ZenPostgresTests: XCTestCase {
     
     override func setUp() {
         var logger = Logger(label: "ZenPostgres")
-        logger.logLevel = .debug
+        logger.logLevel = .trace
         
         let config = PostgresConfig(
             host: "localhost",

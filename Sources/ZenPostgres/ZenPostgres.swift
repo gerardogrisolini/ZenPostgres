@@ -22,7 +22,7 @@ public class ZenPostgres: ZenPostgresProtocol {
 
     private let logger: Logger
     private let eventLoopGroup: EventLoopGroup
-    private let connectionPool: ConnectionPool<PostgresConnectionSource>
+    private let connectionPool: EventLoopGroupConnectionPool<PostgresConnectionSource>
        
     public init(config: PostgresConfig, eventLoopGroup: EventLoopGroup) {
         self.logger = config.logger
@@ -37,10 +37,13 @@ public class ZenPostgres: ZenPostgresProtocol {
             tlsConfiguration: config.tls ? TLSConfiguration.forClient(certificateVerification: .none) : nil
         )
         
-        let source = PostgresConnectionSource(configuration: configuration)
-        
-        connectionPool = ConnectionPool(configuration: .init(maxConnections: config.maximumConnections), source: source, logger: config.logger, on: self.eventLoopGroup)
-        
+        connectionPool = EventLoopGroupConnectionPool(
+            source: PostgresConnectionSource(configuration: configuration),
+            maxConnectionsPerEventLoop: config.maximumConnections,
+            logger: config.logger,
+            on: self.eventLoopGroup
+        )
+
         ZenPostgres.pool = self
         
         logger.info(Logger.Message(stringLiteral: "☯️ ZenPostgres started on \(config.host):\(config.port)"))
@@ -69,7 +72,7 @@ public class ZenPostgres: ZenPostgresProtocol {
     }
     
     public func log(_ message: String) {
-        logger.debug(Logger.Message(stringLiteral: message))
+        logger.trace(Logger.Message(stringLiteral: message))
     }
 }
 
