@@ -46,18 +46,24 @@ public class ZenPostgres: Database {
 
     public func connect() -> EventLoopFuture<PostgresConnection> {
         return connectionPool.requestConnection().map { conn -> PostgresConnection in
-            debugPrint("CONNECT")
+            #if DEBUG
+            print("CONNECT")
+            #endif
             return conn
         }
     }
 
     public func disconnect(_ connection: PostgresConnection) {
-        debugPrint("DISCONNECT")
+        #if DEBUG
+        print("DISCONNECT")
+        #endif
         connectionPool.releaseConnection(connection)
     }
 
     public func close() throws {
-        debugPrint("CLOSE")
+        #if DEBUG
+        print("CLOSE")
+        #endif
         connectionPool.shutdown()
         try eventLoopGroup.syncShutdownGracefully()
     }
