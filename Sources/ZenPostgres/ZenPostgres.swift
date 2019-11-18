@@ -7,21 +7,25 @@
 
 import Foundation
 import PostgresKit
+import Logging
 
 
-public protocol Database {
+public protocol ZenPostgresProtocol {
     func connect() -> EventLoopFuture<PostgresConnection>
     func disconnect(_ connection: PostgresConnection)
     func close() throws
+    func log(_ message: String)
 }
 
-public class ZenPostgres: Database {
+public class ZenPostgres: ZenPostgresProtocol {
     public static var pool: ZenPostgres!
 
+    private let logger: Logger
     private let eventLoopGroup: EventLoopGroup
     private let connectionPool: ConnectionPool<PostgresConnectionSource>
        
     public init(config: PostgresConfig, eventLoopGroup: EventLoopGroup) {
+        self.logger = config.logger
         self.eventLoopGroup = eventLoopGroup
         
         let configuration = PostgresConfiguration(
@@ -38,6 +42,8 @@ public class ZenPostgres: Database {
         connectionPool = ConnectionPool(configuration: .init(maxConnections: config.maximumConnections), source: source, logger: config.logger, on: self.eventLoopGroup)
         
         ZenPostgres.pool = self
+        
+        logger.info(Logger.Message(stringLiteral: "☯️ ZenPostgres started on \(config.host):\(config.port)"))
     }
 
     public func newPromise<T>() -> EventLoopPromise<T> {
@@ -46,26 +52,24 @@ public class ZenPostgres: Database {
 
     public func connect() -> EventLoopFuture<PostgresConnection> {
         return connectionPool.requestConnection().map { conn -> PostgresConnection in
-            #if DEBUG
-            print("CONNECT")
-            #endif
+            self.log("▶️ Connect")
             return conn
         }
     }
 
     public func disconnect(_ connection: PostgresConnection) {
-        #if DEBUG
-        print("DISCONNECT")
-        #endif
+        self.log("⏹️ Disconnect")
         connectionPool.releaseConnection(connection)
     }
 
     public func close() throws {
-        #if DEBUG
-        print("CLOSE")
-        #endif
+        self.log("☯️ ZenPostgres stopped")
         connectionPool.shutdown()
         try eventLoopGroup.syncShutdownGracefully()
+    }
+    
+    public func log(_ message: String) {
+        logger.debug(Logger.Message(stringLiteral: message))
     }
 }
 

@@ -120,9 +120,7 @@ open class PostgresTable {
     }
     
     fileprivate func query(_ conn: PostgresConnection, _ sql: String) -> EventLoopFuture<[PostgresRow]> {
-        #if DEBUG
-        print(sql)
-        #endif
+        ZenPostgres.pool.log("🔄 \(sql)")
         return conn.simpleQuery(sql)
     }
     
