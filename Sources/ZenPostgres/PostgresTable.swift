@@ -163,7 +163,7 @@ open class PostgresTable {
                     verbage += "bigint DEFAULT 0"
                 } else if child.value is [UInt8] {
                     verbage += "bytea"
-                } else if child.value is PostgresJson || if child.value is Data {
+                } else if child.value is PostgresJson || child.value is Data {
                     verbage += "jsonb"
                 } else if child.value is String && key.contains("xml") {
                     verbage += "xml"
