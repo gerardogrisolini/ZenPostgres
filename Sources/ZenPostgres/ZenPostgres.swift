@@ -18,13 +18,16 @@ public protocol ZenPostgresProtocol {
 }
 
 public class ZenPostgres: ZenPostgresProtocol {
-    public static var pool: ZenPostgres!
+    public static var pool = ZenPostgres()
 
-    private let logger: Logger
-    private let eventLoopGroup: EventLoopGroup
-    private let connectionPool: EventLoopGroupConnectionPool<PostgresConnectionSource>
+    private var logger: Logger!
+    private var eventLoopGroup: EventLoopGroup!
+    private var connectionPool: EventLoopGroupConnectionPool<PostgresConnectionSource>!
        
-    public init(config: PostgresConfig, eventLoopGroup: EventLoopGroup) {
+    private init() {        
+    }
+    
+    public func setup(config: PostgresConfig, eventLoopGroup: EventLoopGroup) {
         self.logger = config.logger
         self.eventLoopGroup = eventLoopGroup
         
@@ -43,9 +46,6 @@ public class ZenPostgres: ZenPostgresProtocol {
             logger: config.logger,
             on: self.eventLoopGroup
         )
-
-        ZenPostgres.pool = self
-        
         logger.info(Logger.Message(stringLiteral: "☯️  ZenPostgres started on \(config.host):\(config.port)"))
     }
 

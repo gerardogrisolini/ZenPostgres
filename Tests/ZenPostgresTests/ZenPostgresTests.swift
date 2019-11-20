@@ -10,7 +10,6 @@ final class ZenPostgresTests: XCTestCase {
     
     private var eventLoopGroup: EventLoopGroup!
     private var connection: PostgresConnection!
-    private var pool: ZenPostgres!
     
     override func setUp() {
         var logger = Logger(label: "ZenPostgres")
@@ -26,18 +25,17 @@ final class ZenPostgresTests: XCTestCase {
             logger: logger
         )
         
-
         do {
             eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)
-            pool = ZenPostgres(config: config, eventLoopGroup: eventLoopGroup)
-            connection = try pool.connect().wait()
+            ZenPostgres.pool.setup(config: config, eventLoopGroup: eventLoopGroup)
+            connection = try ZenPostgres.pool.connect().wait()
         } catch {
             XCTFail(error.localizedDescription)
         }
     }
     
     override func tearDown() {
-        pool.disconnect(connection)
+        ZenPostgres.pool.disconnect(connection)
         try! eventLoopGroup.syncShutdownGracefully()
     }
 
