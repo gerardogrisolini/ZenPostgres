@@ -54,7 +54,7 @@ public class ZenPostgres: ZenPostgresProtocol {
     }
 
     public func connect() -> EventLoopFuture<PostgresConnection> {
-        return connectionPool..requestConnection().map { conn -> PostgresConnection in
+        return connectionPool.requestConnection().map { conn -> PostgresConnection in
             self.log("▶️ Connect")
             return conn
         }
