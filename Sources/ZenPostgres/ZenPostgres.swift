@@ -46,7 +46,7 @@ public class ZenPostgres: ZenPostgresProtocol {
             logger: config.logger,
             on: self.eventLoopGroup
         )
-        logger.info(Logger.Message(stringLiteral: "☯️  ZenPostgres started on \(config.host):\(config.port)"))
+        logger.info(Logger.Message(stringLiteral: "☯️ ZenPostgres started on \(config.host):\(config.port)"))
     }
 
     public func newPromise<T>() -> EventLoopPromise<T> {
@@ -66,7 +66,7 @@ public class ZenPostgres: ZenPostgresProtocol {
     }
 
     public func close() {
-        self.log("☯️  ZenPostgres terminated")
+        self.log("☯️ ZenPostgres terminated")
         connectionPool.shutdown()
     }
     
