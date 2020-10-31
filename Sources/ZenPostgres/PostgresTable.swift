@@ -121,7 +121,9 @@ open class PostgresTable {
     
     fileprivate func query(_ conn: PostgresConnection, _ sql: String) -> EventLoopFuture<[PostgresRow]> {
         ZenPostgres.pool.log("🔄 \(sql)")
-        return conn.query(sql)
+        return conn.query(sql).map { result -> [PostgresRow] in
+            result.rows
+        }
     }
     
     public func sqlRowsAsync(_ sql: String) -> EventLoopFuture<[PostgresRow]> {
