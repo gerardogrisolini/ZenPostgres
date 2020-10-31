@@ -163,9 +163,9 @@ open class PostgresTable {
                     verbage += "double precision DEFAULT 0"
                 } else if child.value is Int64 {
                     verbage += "bigint DEFAULT 0"
-                } else if child.value is [UInt8] {
+                } else if child.value is [UInt8] || child.value is Data {
                     verbage += "bytea"
-                } else if child.value is PostgresJson || child.value is Data {
+                } else if child.value is PostgresJson || child.value is [PostgresJson] {
                     verbage += "jsonb"
                 } else if child.value is String && key.contains("xml") {
                     verbage += "xml"
