@@ -21,7 +21,7 @@ final class ZenPostgresTests: XCTestCase {
             tls: false,
             username: "gerardo",
             password: "",
-            database: "zenpostgres",
+            database: "zenretail",
             logger: logger
         )
         
