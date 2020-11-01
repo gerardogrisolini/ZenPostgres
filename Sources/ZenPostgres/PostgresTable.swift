@@ -141,37 +141,39 @@ open class PostgresTable {
         var opt = [String]()
         var keyName = ""
         for child in Mirror(reflecting: self).children {
-            guard let key = child.label else {
-                continue
-            }
+            guard let key = child.label else { continue }
+            
             var verbage = ""
             if !key.hasPrefix("_") {
                 verbage = "\"\(key)\" "
-                if child.value is Int && opt.count == 0 {
+                
+                switch child.value {
+                case is Int where opt.count == 0:
                     verbage += "serial"
-                } else if child.value is Int {
+                case is Int:
                     verbage += "int DEFAULT 0"
                     if key.hasSuffix("Id") {
                         let table = key[..<key.index(key.endIndex, offsetBy: -2)].description
                         verbage += " REFERENCES \"\(table.capitalizingFirstLetter())\" ON DELETE CASCADE"
                     }
-                } else if child.value is Bool {
+                case is Bool:
                     verbage += "boolean DEFAULT false"
-                } else if child.value is Character {
+                case is Character:
                     verbage += "char DEFAULT ' '"
-                } else if child.value is Double {
+                case is Double:
                     verbage += "double precision DEFAULT 0"
-                } else if child.value is Int64 {
+                case is Int64:
                     verbage += "bigint DEFAULT 0"
-                } else if child.value is [UInt8] {
+                case is Data:
                     verbage += "bytea"
-                } else if child.value is PostgresJson || child.value is [PostgresJson] {
+                case is PostgresJson, is [PostgresJson]:
                     verbage += "jsonb"
-                } else if child.value is String && key.contains("xml") {
+                case is String where key.contains("xml"):
                     verbage += "xml"
-                } else {
+                default:
                     verbage += "text"
                 }
+                
                 if opt.count == 0 {
                     verbage += " NOT NULL"
                     keyName = key

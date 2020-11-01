@@ -66,8 +66,6 @@ final class ZenPostgresTests: XCTestCase {
                 XCTFail(err.localizedDescription)
             }
         }
-        
-        sleep(2)
     }
 
     func testDropTablesAsync() {
@@ -215,7 +213,7 @@ final class ZenPostgresTests: XCTestCase {
         file.name = "IMG_0001.png"
         file.contentType = "image/png"
         if let data = FileManager.default.contents(atPath: "/Users/gerardo/Downloads/IMG_0001.png") {
-            file.data = [UInt8](data)
+            file.data = data
         }
         XCTAssertNoThrow(try file.save().wait())
         XCTAssertTrue(file.id > 0)
@@ -261,7 +259,8 @@ final class ZenPostgresTests: XCTestCase {
         public var organizationName: String = ""
         public var organizationStore: Store = Store()
         public var _account: Account = Account()
-        
+        public var stores: [Store] = [Store]()
+
         enum CodingKeys: String, CodingKey {
             case organizationId = "organizationId"
             case organizationName = "organizationName"
@@ -318,13 +317,15 @@ final class ZenPostgresTests: XCTestCase {
     class File: PostgresTable, Codable {
         public var id: Int = 0
         public var name: String = ""
-        public var data: [UInt8] = [UInt8]()
+        public var data: Data = Data()
         public var contentType: String = ""
         
         override func decode(row: PostgresRow) {
             id = row.column("id")?.int ?? id
             name = row.column("name")?.string ?? name
-            data = row.column("data")?.bytes ?? data
+            if let d = row.column("data") {
+                data = Data(d.bytes!)
+            }
             contentType = row.column("contentType")?.string ?? contentType
         }
         
